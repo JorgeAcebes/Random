@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elecciones Aleatorias</title>
+    <style>
+        /* [Mantén todos los estilos anteriores igual hasta .dice-face] */
+
+        .dice-face {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            background: white;
+            border: 2px solid #333;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #333;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.1);
+        }
+
+        /* Posiciones de las caras del dado */
+        .face-1 { transform: rotateY(0deg) translateZ(60px); }
+        .face-2 { transform: rotateY(90deg) translateZ(60px); }
+        .face-3 { transform: rotateY(180deg) translateZ(60px); }
+        .face-4 { transform: rotateY(-90deg) translateZ(60px); }
+        .face-5 { transform: rotateX(90deg) translateZ(60px); }
+        .face-6 { transform: rotateX(-90deg) translateZ(60px); }
+
+        /* Animación de lanzamiento */
+        .dice.rolling {
+            animation: diceRoll 1.5s ease-out forwards;
+        }
+
+        @keyframes diceRoll {
+            0% { transform: rotateX(0) rotateY(0) rotateZ(0); }
+            20% { transform: rotateX(180deg) rotateY(90deg) rotateZ(45deg); }
+            40% { transform: rotateX(360deg) rotateY(180deg) rotateZ(90deg); }
+            60% { transform: rotateX(540deg) rotateY(270deg) rotateZ(135deg); }
+            80% { transform: rotateX(720deg) rotateY(360deg) rotateZ(180deg); }
+            100% { transform: var(--final-rotation); }
+        }
+
+        /* [Mantén el resto de estilos igual] */
+    </style>
+</head>
+<body>
+    <!-- [Mantén todo el HTML anterior igual hasta el script] -->
+
+    <script>
+        // [Mantén las funciones anteriores igual hasta rollDice()]
+
+        // Funciones del dado - Versión corregida y sincronizada
+        function rollDice() {
+            if (isAnimating) return;
+            
+            isAnimating = true;
+            const dice = document.querySelector('.dice');
+            const result = document.getElementById('dice-result');
+            const faces = parseInt(document.getElementById('dice-faces').value);
+            
+            dice.classList.add('rolling');
+            result.textContent = 'Lanzando...';
+            
+            const diceResult = Math.floor(Math.random() * faces) + 1;
+            
+            // Configuramos la rotación final para que muestre la cara correcta
+            let finalRotation;
+            switch(diceResult) {
+                case 1: finalRotation = 'rotateX(0deg) rotateY(0deg) rotateZ(0deg)'; break;
+                case 2: finalRotation = 'rotateX(0deg) rotateY(-90deg) rotateZ(0deg)'; break;
+                case 3: finalRotation = 'rotateX(0deg) rotateY(180deg) rotateZ(0deg)'; break;
+                case 4: finalRotation = 'rotateX(0deg) rotateY(90deg) rotateZ(0deg)'; break;
+                case 5: finalRotation = 'rotateX(-90deg) rotateY(0deg) rotateZ(0deg)'; break;
+                case 6: finalRotation = 'rotateX(90deg) rotateY(0deg) rotateZ(0deg)'; break;
+                default: finalRotation = 'rotateX(0deg) rotateY(0deg) rotateZ(0deg)'; // Para dados con más caras
+            }
+            
+            // Establecemos la rotación final como variable CSS
+            dice.style.setProperty('--final-rotation', finalRotation);
+            
+            setTimeout(() => {
+                dice.classList.remove('rolling');
+                // Forzar la actualización del estilo
+                dice.style.transform = finalRotation;
+                
+                // Para dados con más de 6 caras, mostramos el número en la cara frontal
+                if (faces > 1) {
+                    const faces = dice.querySelectorAll('.dice-face');
+                    faces[0].textContent = diceResult; // Cara frontal (1)
+                    faces[1].textContent = '2';
+                    faces[2].textContent = '3';
+                    faces[3].textContent = '4';
+                    faces[4].textContent = '5';
+                    faces[5].textContent = '6';
+                }
+                
+                result.textContent = `Resultado: ${diceResult}`;
+                isAnimating = false;
+            }, 1500);
+        }
+
+        // [Mantén el resto de funciones igual]
+    </script>
+</body>
+</html>
